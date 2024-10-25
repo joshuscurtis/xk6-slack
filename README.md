@@ -1,25 +1,18 @@
 # xk6-slack
 
-This is a [k6](https://go.k6.io/k6) extension for sending test results to Slack using the xk6 system.
+xk6 extension for sending k6 test results to Slack.
 
 ## Build
 
-To build a `k6` binary with this extension, first ensure you have the prerequisites:
+1. Install xk6:
+```bash
+go install go.k6.io/xk6/cmd/xk6@latest
+```
 
-- [Go](https://go.dev/) 1.19+
-- Git
-
-Then:
-
-1. Install `xk6`:
-  ```bash
-  go install go.k6.io/xk6/cmd/xk6@latest
-  ```
-
-2. Build the binary:
-  ```bash
-  xk6 build --with github.com/joshuscurtis/xk6-slack@latest
-  ```
+2. Build k6 with the extension:
+```bash
+xk6 build --with github.com/joshuscurtis/xk6-slack@latest
+```
 
 ## Usage
 
@@ -27,22 +20,24 @@ Then:
 import slack from 'k6/x/slack';
 
 const slackConfig = {
-    slackChannelID: 'YOUR_CHANNEL_ID',
+    slackChannelID: __ENV.SLACK_CHANNEL,
     dashboardUrls: {
-        'K6 Dashboard': '/path-to/k6-dashboard',
+        'K6 Dashboard': '/your/dashboard/url',
     },
 };
 
 export function setup() {
     const slackClient = new slack.Client();
-    slackClient.configure(
-        __ENV.SLACK_TOKEN,
-        slackConfig,
-        __ENV.GITLAB_USER_LOGIN
-    );
+    slackClient.configure(__ENV.SLACK_TOKEN, slackConfig, __ENV.GITLAB_USER_LOGIN);
     slackClient.sendMessage('Start');
 }
 ```
+
+## Environment Variables
+
+- SLACK_TOKEN: Slack Bot User OAuth Token
+- SLACK_CHANNEL: Channel ID to post messages
+- GITLAB_USER_LOGIN: Username to attribute the test run
 
 ## Development
 
@@ -50,7 +45,3 @@ export function setup() {
 2. Install dependencies: `make setup`
 3. Run tests: `make test`
 4. Build locally: `make build`
-
-## License
-
-Apache License 2.0

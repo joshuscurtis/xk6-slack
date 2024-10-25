@@ -6,7 +6,7 @@ test:
 
 .PHONY: build
 build:
-	xk6 build --with github.com/$(shell git config --get remote.origin.url | sed 's/.*:\(.*\)\.git/\1/')@latest
+	xk6 build --with github.com/joshuscurtis/xk6-slack@latest
 
 .PHONY: lint
 lint:
@@ -19,7 +19,8 @@ fmt:
 .PHONY: setup
 setup:
 	go mod download
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/golangci/golint/cmd/golint@latest
+	go install go.k6.io/xk6/cmd/xk6@latest
 
 .PHONY: clean
 clean:

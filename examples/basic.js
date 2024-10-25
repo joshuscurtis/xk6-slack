@@ -1,9 +1,7 @@
 import slack from 'k6/x/slack';
-import http from 'k6/http';
-import { check, sleep } from 'k6';
 
 export const options = {
-    vus: 10,
+    vus: 1,
     duration: '30s',
 };
 
@@ -22,21 +20,20 @@ const slackConfig = {
 };
 
 const slackClient = new slack.Client();
-slackClient.configure(SLACK_TOKEN, slackConfig, USER);
 
 export function setup() {
+    slackClient.configure(SLACK_TOKEN, slackConfig, USER);
     slackClient.sendMessage('Start');
 }
 
-export default function () {
-    const response = http.get('https://test.k6.io');
-    check(response, {
-        'status is 200': (r) => r.status === 200,
-    });
-    sleep(1);
-}
-
 export function handleSummary(data) {
+    const metrics = {
+        'Average Response Time': `${data.metrics.http_req_duration.values.avg.toFixed(2)}ms`,
+        'P95 Response Time': `${data.metrics.http_req_duration.values.p95.toFixed(2)}ms`,
+        'Request Rate': `${data.metrics.iterations.values.rate.toFixed(2)}/s`,
+    };
+    
+    slackClient.addTestMetrics(metrics);
     slackClient.sendMessage('End');
     return {};
 }
