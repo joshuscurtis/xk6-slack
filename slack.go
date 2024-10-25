@@ -17,10 +17,6 @@ type Client struct {
 	channel string
 }
 
-func (*SlackAPI) NewModuleInstance(m modules.VU) modules.Instance {
-	return &Client{}
-}
-
 // Configure sets up the slack client
 func (c *Client) Configure(token string, channel string) error {
 	if token == "" {
