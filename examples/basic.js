@@ -5,35 +5,25 @@ export const options = {
     duration: '30s',
 };
 
-const SLACK_TOKEN = __ENV.SLACK_TOKEN;
-const SLACK_CHANNEL = __ENV.SLACK_CHANNEL;
-const USER = __ENV.GITLAB_USER_LOGIN || 'k6-user';
-
-const slackConfig = {
-    slackChannelID: SLACK_CHANNEL,
-    dashboardUrls: {
-        'K6 Dashboard': '/path-to/k6-dashboard',
-    },
-    graphUrls: {
-        'Response Time Trend': 'https://your-graph-url',
-    },
-};
-
-const slackClient = new slack.Client();
+// Initialize the slack module
+slack.configure(ENV.SLACK_TOKEN, ENV.SLACK_CHANNEL_ID);
 
 export function setup() {
-    slackClient.configure(SLACK_TOKEN, slackConfig, USER);
-    slackClient.sendMessage('Start');
+    slack.sendMessage("🧪 Test starting!");
+    return {};
+}
+
+export default function() {
+    const res = http.get('https://www.google.com');
+
+    check(res, {
+      'is status 200': (r) => r.status === 200,
+    });
 }
 
 export function handleSummary(data) {
-    const metrics = {
-        'Average Response Time': `${data.metrics.http_req_duration.values.avg.toFixed(2)}ms`,
-        'P95 Response Time': `${data.metrics.http_req_duration.values.p95.toFixed(2)}ms`,
-        'Request Rate': `${data.metrics.iterations.values.rate.toFixed(2)}/s`,
-    };
-    
-    slackClient.addTestMetrics(metrics);
-    slackClient.sendMessage('End');
+
+    console.log(JSON.stringify(data, null, 2));
+    slack.sendTestResults(data);
     return {};
 }
