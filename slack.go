@@ -41,7 +41,6 @@ func (c *Client) Configure(token string, channel string) error {
 	if channel == "" {
 		return fmt.Errorf("slack channel cannot be empty")
 	}
-
 	c.api = slack.New(token)
 	c.channel = channel
 	return nil
@@ -52,12 +51,10 @@ func (c *Client) SendMessage(message string) error {
 	if c.api == nil {
 		return fmt.Errorf("slack client not configured, call Configure() first")
 	}
-
 	_, _, err := c.api.PostMessage(
 		c.channel,
 		slack.MsgOptionText(message, false),
 	)
-
 	return err
 }
 
